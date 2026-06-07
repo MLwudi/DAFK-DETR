@@ -1,18 +1,12 @@
-# Ultralytics YOLO 🚀, AGPL-3.0 license
-# RT-DETR-l object detection model with P3-P5 outputs. For details see https://docs.ultralytics.com/models/rtdetr
-# Ultralytics YOLO 🚀, AGPL-3.0 license
-# RT-DETR-l object detection model with P3-P5 outputs. For details see https://docs.ultralytics.com/models/rtdetr
 
-# Parameters
 nc: 80  # number of classes
-scales: # model compound scaling constants, i.e. 'model=yolov8n-cls.yaml' will call yolov8-cls.yaml with scale 'n'
+scales: 
   # [depth, width, max_channels]
   l: [1.00, 1.00, 1024]
 fusion_mode: bifpn
 node_mode: CSP_MSCB
 head_channel: 128
 
-# From BiliBili 魔鬼面具
 backbone:
   - [-1, 1, HGStem, [16, 32]]  # 0-P2/4
 
