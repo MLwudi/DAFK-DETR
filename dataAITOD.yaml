@@ -1,0 +1,10 @@
+
+
+path: /home/lihejiang/RTDETR-main/AITOD/
+train: train/images
+val: val/images/
+test: test/images/
+
+# Classes
+nc: 8  # number of classes
+names: [ "airplane", "bridge", "storage-tank","ship","swimming-pool","vehicle","person","wind-mill"]  # class name

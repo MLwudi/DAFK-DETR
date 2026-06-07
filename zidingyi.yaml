@@ -1,0 +1,82 @@
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# RT-DETR-l object detection model with P3-P5 outputs. For details see https://docs.ultralytics.com/models/rtdetr
+# Ultralytics YOLO 🚀, AGPL-3.0 license
+# RT-DETR-l object detection model with P3-P5 outputs. For details see https://docs.ultralytics.com/models/rtdetr
+
+# Parameters
+nc: 80  # number of classes
+scales: # model compound scaling constants, i.e. 'model=yolov8n-cls.yaml' will call yolov8-cls.yaml with scale 'n'
+  # [depth, width, max_channels]
+  l: [1.00, 1.00, 1024]
+fusion_mode: bifpn
+node_mode: CSP_MSCB
+head_channel: 128
+
+# From BiliBili 魔鬼面具
+backbone:
+  - [-1, 1, HGStem, [16, 32]]  # 0-P2/4
+
+  - [0, 1, C2f, [32]] # 1-P2/4
+  - [-1, 1, Conv, [64, 3, 2]] # 2-P3/8
+  - [-1, 1, C2f, [64]] # 3-P3/8
+
+  - [0, 3, HGBlock, [16, 32, 3]] # 4-P2/4
+  - [-1, 1, DWConv, [64, 3, 2, 1, False]]  # 5-P3/8
+  - [-1, 3, HGBlock, [32, 64, 3]]   # 6-P3/8
+
+  - [[3, 6], 1, DynamicAlignFusion, [64]] # 7-P3/8
+
+  - [7, 1, Conv, [128, 3, 2]]  # 8-P4/16
+  - [-1, 1, C2f, [128]] # 9-P4/16
+
+  - [7, 1, DWConv, [128, 3, 2, 1, False]]  # 10-P4/16
+  - [-1, 3, HGBlock, [64, 128, 5, True, False]]  # cm, c2, k, light, shortcut
+  - [-1, 3, HGBlock, [64, 128, 5, True, True]]
+  - [-1, 3, HGBlock, [64, 128, 5, True, True]]  # 13-P4/16
+
+  - [[9, 13], 1, DynamicAlignFusion, [128]] # 14-P4/16
+
+  - [14, 1, Conv, [256, 3, 2]]  # 15-P5/32
+  - [-1, 3, C2f, [256]] # 16-P5/32
+
+  - [14, 1, DWConv, [256, 3, 2, 1, False]]  # 17-P5/32
+  - [-1, 3, HGBlock, [128, 256, 5, True, False]]  # 18-P5/32
+
+  - [[16, 18], 1, DynamicAlignFusion, [256]] # 19-P5/32
+head:
+  - [-1, 1, Conv, [256, 1, 1, None, 1, 1, False]]  # 20 input_proj.2
+  - [-1, 1, AIFI, [1024, 8]] # 9
+  - [-1, 1, Conv, [256, 1, 1]]  # 22, Y5, lateral_convs.0
+
+  - [7, 1, Conv, [head_channel]]  # 23-P3/8
+  - [14, 1, Conv, [head_channel]]  # 24-P4/16
+  - [19, 1, Conv, [head_channel]]  # 25-P5/32
+
+  - [24, 1, Conv, [head_channel, 3, 2]] # 26-P5/32
+  - [[-1, 25], 1, Fusion, [fusion_mode]] # 27
+  - [-1, 1, node_mode, [head_channel, [5,7,9]]] # 28-P5/32
+
+  - [-1, 1, EUCB, []] # 29-P4/16
+  - [23, 1, Conv, [head_channel, 3, 2]] # 30-P4/16
+  - [[-1, -2, 24], 1, Fusion, [fusion_mode]] # 31
+  - [-1, 1, node_mode, [head_channel, [3,5,7]]] # 32-P4/16
+
+  - [-1, 1, EUCB, []] # 33-P3/8
+  - [0, 1, Conv, [head_channel, 3, 2]] # 34-P3/8
+  - [[-1, -2, 23], 1, Fusion, [fusion_mode]] # 35
+  - [-1, 1, node_mode, [head_channel, [1,3,5]]] # 36-P3/8
+
+  - [[33, -1], 1, Fusion, [fusion_mode]] # 37
+  - [-1, 1, node_mode, [head_channel, [1,3,5]]] # 38-P3/8
+
+  - [36, 1, Conv, [head_channel, 3, 2]] # 39-P4/16
+  - [38, 1, Conv, [head_channel, 3, 2]] # 40-P4/16
+  - [[-1, -2, 32, 29], 1, Fusion, [fusion_mode]] # 41-P4/16
+  - [-1, 1, node_mode, [head_channel, [3,5,7]]] # 42-P4/16
+
+  - [32, 1, Conv, [head_channel, 3, 2]] # 43-P5/32
+  - [42, 1, Conv, [head_channel, 3, 2]] # 44-P5/32
+  - [[-1, -2, 28], 1, Fusion, [fusion_mode]] # 45-P5/32
+  - [-1, 1, node_mode, [head_channel, [5,7,9]]] # 46-P5/32
+
+  - [[38, 42, 46], 1, RTDETRDecoder, [nc, 256, 500, 4, 8, 3]]  # Detect(P3, P4, P5)
