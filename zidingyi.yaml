@@ -4,7 +4,7 @@ scales:
   # [depth, width, max_channels]
   l: [1.00, 1.00, 1024]
 fusion_mode: bifpn
-node_mode: CSP_MSCB
+node_mode: SAFE
 head_channel: 128
 
 backbone:

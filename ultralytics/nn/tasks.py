@@ -733,7 +733,7 @@ def parse_model(d, ch, verbose=True, warehouse_manager=None):  # model_dict, inp
 
         n = n_ = max(round(n * depth), 1) if n > 1 else n  # depth gain
         if m in (Classify, Conv, ConvTranspose, GhostConv, Bottleneck, GhostBottleneck, SPP, SPPF, DWConv, DSConv, Focus,
-                 BottleneckCSP, C1, C2, C2f, C3, C3TR, C3Ghost, nn.Conv2d, nn.ConvTranspose2d, DWConvTranspose2d, C3x, RepC3,CSP_MSCB,
+                 BottleneckCSP, C1, C2, C2f, C3, C3TR, C3Ghost, nn.Conv2d, nn.ConvTranspose2d, DWConvTranspose2d, C3x, RepC3,SAFE,
                  ConvNormLayer):
             if args[0] == 'head_channel':
                 args[0] = d[args[0]]
@@ -743,7 +743,7 @@ def parse_model(d, ch, verbose=True, warehouse_manager=None):  # model_dict, inp
 
             args = [c1, c2, *args[1:]]
     
-            if m in (BottleneckCSP, C1, C2, C2f, C3, C3TR, C3Ghost, C3x, RepC3, CSP_MSCB):
+            if m in (BottleneckCSP, C1, C2, C2f, C3, C3TR, C3Ghost, C3x, RepC3, SAFE):
                 args.insert(2, n)  # number of repeats
                 n = 1
         elif m in (AIFI,):

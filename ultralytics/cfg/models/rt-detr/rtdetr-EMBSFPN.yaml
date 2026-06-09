@@ -7,7 +7,7 @@ scales: # model compound scaling constants, i.e. 'model=yolov8n-cls.yaml' will c
   # [depth, width, max_channels]
   l: [1.00, 1.00, 1024]
 fusion_mode: bifpn
-node_mode: CSP_MSCB
+node_mode: SAFE
 head_channel: 128
 
 # From BiliBili 魔鬼面具

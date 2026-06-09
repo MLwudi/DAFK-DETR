@@ -18,7 +18,7 @@ from ultralytics.utils.torch_utils import fuse_conv_and_bn, make_divisible
 
 from timm.layers import CondConv2d, DropPath, trunc_normal_, use_fused_attn, to_2tuple
 
-__all__ = [ 'CSP_MSCB', 'EUCB','DynamicAlignFusion','Fusion']
+__all__ = [ 'SAFE', 'EUCB','DynamicAlignFusion','Fusion']
 
 ######################################## Efficient Multi-Branch&Scale FPN start ########################################
 
@@ -142,7 +142,7 @@ class MSCB(nn.Module):
         x = x.view(batchsize, -1, height, width)
         return x
 
-class CSP_MSCB(C2f):
+class SAFE(C2f):
     def __init__(self, c1, c2, n=1, kernel_sizes=[1,3,5], shortcut=False, g=1, e=0.5):
         super().__init__(c1, c2, n, shortcut, g, e)
         
